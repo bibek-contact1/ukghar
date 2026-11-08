@@ -772,7 +772,9 @@
         btn.textContent = "Sending…";
         try {
           if (C.formEndpoint) {
-            const res = await fetch(C.formEndpoint, { method: "POST", body: new FormData(form), headers: { Accept: "application/json" } });
+            // Google Apps Script reads URL-encoded data; other services accept FormData
+            const body = C.formEndpoint.includes("script.google.com") ? new URLSearchParams(new FormData(form)) : new FormData(form);
+            const res = await fetch(C.formEndpoint, { method: "POST", body, headers: { Accept: "application/json" } });
             const data = await res.json().catch(() => ({}));
             if (!res.ok || String(data.success) === "false") throw new Error(data.message || "Request failed");
           } else {

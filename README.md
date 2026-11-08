@@ -90,3 +90,7 @@ That's it. Enquiries will arrive in your inbox.
 ├── server.js             ← local dev server (not needed when hosting)
 └── start.bat             ← double-click to run on Windows
 ```
+
+## Enquiry emails
+
+To get contact-form enquiries in Gmail for free, follow [email-setup/SETUP.md](email-setup/SETUP.md).
