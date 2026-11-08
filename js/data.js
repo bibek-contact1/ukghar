@@ -175,22 +175,16 @@ window.UKGHAR = {
 
   /* ---------- Room types (prices are PER MONTH) ----------
      perPerson: true  -> price is shown as "per person / month"
-     sharing: how many people share the room (1 = single / private,
-              2 = double, 3 = triple ...). Used by the "Sharing" filter.
-     photos: list of { src, caption }. Use your own: "assets/images/premium-1.jpg"
+     photos:  list of { src, caption }. Use your own: "assets/images/premium-1.jpg"
      videos:  list of videos shown in the room's gallery. Two ways:
                 { src: "assets/videos/premium-tour.mp4", caption: "Room tour" }
                 { youtube: "VIDEO_ID", caption: "Room tour" }
               Leave as [] if there are no videos for that room.            */
-  /* Price points offered in the "Min price" / "Max price" filters (£ per month) */
-  budgetSteps: [250, 300, 350, 400, 500, 700, 1000, 1500, 2000],
-
   roomTypes: [
     {
       name: "Premium studio",
       priceFrom: 1500,
       perPerson: false,
-      sharing: 1,          // 1 = single / private room
       image: "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=900&q=70",
       features: ["Extra-large private studio, higher floor", "Own full kitchen & en-suite bathroom", "Double bed, desk & lounge area"],
       bestFor: "Extra space",
@@ -208,7 +202,6 @@ window.UKGHAR = {
       name: "Twin studio",
       priceFrom: 700,
       perPerson: true,
-      sharing: 2,
       image: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=900&q=70",
       features: ["Studio shared with one friend", "Two beds & two desks", "Private kitchenette & bathroom"],
       bestFor: "Live with a friend",
@@ -225,7 +218,6 @@ window.UKGHAR = {
       name: "Double sharing room",
       priceFrom: 400,
       perPerson: true,
-      sharing: 2,
       image: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=900&q=70",
       features: ["Room shared by 2 students", "Own bed, desk & wardrobe each", "Shared kitchen & bathroom"],
       bestFor: "Most popular",
@@ -242,7 +234,6 @@ window.UKGHAR = {
       name: "Triple sharing room",
       priceFrom: 320,
       perPerson: true,
-      sharing: 3,
       image: "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=900&q=70",
       features: ["Room shared by 3 students", "Own bed, desk & storage each", "Shared kitchen & bathroom"],
       bestFor: "Great value",
@@ -258,7 +249,6 @@ window.UKGHAR = {
       name: "4-person sharing room",
       priceFrom: 300,
       perPerson: true,
-      sharing: 4,
       image: "https://images.unsplash.com/photo-1493809842364-78817add7ffb?auto=format&fit=crop&w=900&q=70",
       features: ["Room shared by 4 students", "Own bed & storage each", "Shared kitchen, lounge & bathroom"],
       bestFor: "Budget friendly",
@@ -275,7 +265,6 @@ window.UKGHAR = {
       name: "5-person sharing room",
       priceFrom: 280,
       perPerson: true,
-      sharing: 5,
       image: "https://images.unsplash.com/photo-1540518614846-7eded433c457?auto=format&fit=crop&w=900&q=70",
       features: ["Room shared by 5 students", "Own bed & storage each", "Shared kitchen, lounge & bathroom"],
       bestFor: "Best value",

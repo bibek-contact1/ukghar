@@ -39,25 +39,6 @@
     return roomUnit(types.reduce((a, b) => (b.priceFrom < a.priceFrom ? b : a)));
   };
 
-  /* ---------------- Room filters (sharing + price) ---------------- */
-  const roomByName = (name) => D.roomTypes.find((r) => r.name === name);
-  const SHARING_LABELS = { 1: "Single (private)", 2: "Double (2 people)", 3: "Triple (3 people)" };
-  const sharingLabel = (n) => SHARING_LABELS[n] || `${n} people`;
-  const sharingValues = () => [...new Set(D.roomTypes.map((r) => r.sharing).filter(Boolean))].sort((a, b) => a - b);
-  const budgetSteps = () => D.budgetSteps || [300, 400, 500, 700, 1000, 1500];
-  const sharingOptions = (anyLabel, selected) =>
-    `<option value="">${anyLabel}</option>` +
-    sharingValues().map((n) => `<option value="${n}"${String(n) === String(selected) ? " selected" : ""}>${esc(sharingLabel(n))}</option>`).join("");
-  const budgetOptions = (anyLabel, selected) =>
-    `<option value="">${anyLabel}</option>` +
-    budgetSteps().map((n) => `<option value="${n}"${String(n) === String(selected) ? " selected" : ""}>${price(n)}</option>`).join("");
-  /* does a room type fit the chosen sharing / price range? */
-  const roomFits = (rt, f) =>
-    !!rt &&
-    (!f.sharing || rt.sharing === Number(f.sharing)) &&
-    (!f.min || rt.priceFrom >= Number(f.min)) &&
-    (!f.max || rt.priceFrom <= Number(f.max));
-
   /* ---------------- Icons (stroke SVG) ---------------- */
   const ICONS = {
     home: '<path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/>',
@@ -566,17 +547,15 @@
     if (!form) return;
     $("#hs-uni", form).innerHTML =
       `<option value="">Any university</option>` + D.universities.map((u) => `<option value="${u.id}">${esc(u.name)}</option>`).join("");
-    $("#hs-sharing", form).innerHTML = sharingOptions("Any sharing");
-    $("#hs-max", form).innerHTML = budgetOptions("Any budget");
+    $("#hs-room", form).innerHTML =
+      `<option value="">Any room type</option>` + allRoomTypes().map((r) => `<option>${esc(r)}</option>`).join("");
     form.addEventListener("submit", (e) => {
       e.preventDefault();
       const p = new URLSearchParams();
       const u = $("#hs-uni", form).value;
-      const s = $("#hs-sharing", form).value;
-      const m = $("#hs-max", form).value;
+      const r = $("#hs-room", form).value;
       if (u) p.set("uni", u);
-      if (s) p.set("sharing", s);
-      if (m) p.set("max", m);
+      if (r) p.set("room", r);
       location.href = "locations.html" + (p.toString() ? "?" + p : "");
     });
   }
@@ -619,89 +598,29 @@
 
     locations() {
       const params = new URLSearchParams(location.search);
-      const legacyRoom = roomByName(params.get("room") || ""); // old links used ?room=<room type>
-      const state = {
-        q: params.get("q") || "",
-        uni: params.get("uni") || "",
-        loc: params.get("loc") || "",
-        sharing: params.get("sharing") || (legacyRoom && legacyRoom.sharing ? String(legacyRoom.sharing) : ""),
-        min: params.get("min") || "",
-        max: params.get("max") || ""
-      };
+      const state = { city: "All", q: "", uni: params.get("uni") || "", room: params.get("room") || "" };
+      const cities = ["All", ...new Set(D.universities.map((u) => u.city))];
 
-      const form = $("#loc-filters");
-      const qInput = $("#loc-q");
-      const uniSel = $("#loc-uni");
-      const locSel = $("#loc-area");
-      const sharSel = $("#loc-sharing");
-      const minSel = $("#loc-min");
-      const maxSel = $("#loc-max");
-      const clearBtn = $("#loc-clear");
+      mount("loc-cities", cities.map((c) => `<button class="pill" type="button" data-city="${esc(c)}" aria-pressed="${c === "All"}">${esc(c)}</button>`).join(""));
+      const roomSel = $("#loc-room");
+      roomSel.innerHTML = `<option value="">Any room type</option>` + allRoomTypes().map((r) => `<option${r === state.room ? " selected" : ""}>${esc(r)}</option>`).join("");
+
       const list = $("#loc-list");
       const count = $("#loc-count");
-      const selects = [[uniSel, "uni"], [locSel, "loc"], [sharSel, "sharing"], [minSel, "min"], [maxSel, "max"]];
-
-      /* Preferred location: each London area, with its neighbourhoods underneath */
-      const cities = [...new Set(D.universities.map((u) => u.city))];
-      locSel.innerHTML = `<option value="">Anywhere in London</option>` + cities.map((c) => {
-        const areas = [...new Set(D.universities.filter((u) => u.city === c).map((u) => u.area))];
-        return `<optgroup label="${esc(c)}"><option value="c:${esc(c)}">All of ${esc(c)}</option>${areas.map((a) => `<option value="a:${esc(a)}">${esc(a)}</option>`).join("")}</optgroup>`;
-      }).join("");
-      uniSel.innerHTML = `<option value="">Any university</option>` + D.universities.map((u) => `<option value="${u.id}">${esc(u.name)}</option>`).join("");
-      sharSel.innerHTML = sharingOptions("Any sharing");
-      minSel.innerHTML = budgetOptions("No min");
-      maxSel.innerHTML = budgetOptions("No max");
-
-      const inArea = (u) => {
-        if (!state.loc) return true;
-        const kind = state.loc.slice(0, 2), val = state.loc.slice(2);
-        return kind === "c:" ? u.city === val : u.area === val;
-      };
-      const roomFilterOn = () => !!(state.sharing || state.min || state.max);
-      const anyFilterOn = () => !!(state.q.trim() || state.uni || state.loc || roomFilterOn());
-
-      /* put state into the controls, and stop impossible price ranges */
-      function syncControls() {
-        qInput.value = state.q;
-        selects.forEach(([sel, key]) => {
-          sel.value = state[key];
-          if (sel.value !== state[key]) { state[key] = ""; sel.value = ""; } // unknown value in URL
-          sel.classList.toggle("is-set", !!state[key]);
-        });
-        $$("option", minSel).forEach((o) => (o.disabled = !!(o.value && state.max && Number(o.value) > Number(state.max))));
-        $$("option", maxSel).forEach((o) => (o.disabled = !!(o.value && state.min && Number(o.value) < Number(state.min))));
-      }
-
-      function syncUrl() {
-        const p = new URLSearchParams();
-        Object.entries(state).forEach(([k, v]) => { if (String(v).trim()) p.set(k, String(v).trim()); });
-        history.replaceState(null, "", "locations.html" + (p.toString() ? "?" + p : ""));
-      }
 
       function propertyRow(p, u) {
         const avClass = /left/i.test(p.availability) ? "warn" : /wait|coming/i.test(p.availability) ? "muted" : "ok";
-        const on = roomFilterOn();
-        const fits = p.matched;
-        const cheapest = fits.reduce((a, b) => (b.priceFrom < a.priceFrom ? b : a));
-        const from = on ? cheapest.priceFrom : p.priceFrom;
-        const unit = on ? roomUnit(cheapest) : cheapestUnit(p.rooms);
-        const tags = p.rooms.map((name) => {
-          const rt = roomByName(name);
-          const cls = on ? (fits.includes(rt) ? " is-match" : " is-dim") : "";
-          return `<span class="tag${cls}">${esc(name)}${rt ? ` · <b>${price(rt.priceFrom)}</b>` : ""}</span>`;
-        }).join("");
-        const roomParam = on && fits.length === 1 ? `&room=${encodeURIComponent(fits[0].name)}` : "";
         return `
           <li class="property">
             <div class="property-main">
               <h4>${esc(p.name)}</h4>
               <p class="meta">${icon("clock")} ${esc(p.distance)} to campus${p.nearest ? ` <span class="dot"></span> ${icon("pin")} ${esc(p.nearest)}` : ""}${p.gender ? ` <span class="dot"></span> ${icon("users")} ${esc(p.gender)}` : ""}</p>
-              <div class="tags">${tags}</div>
+              <div class="tags">${p.rooms.map((r) => `<span class="tag">${esc(r)}</span>`).join("")}</div>
             </div>
             <div class="property-side">
               <span class="status status-${avClass}">${esc(p.availability)}</span>
-              <p class="price">From <strong>${price(from)}</strong> <span>${unit}</span></p>
-              <a class="btn btn-primary btn-sm" href="contact.html?uni=${u.id}&property=${encodeURIComponent(p.name)}${roomParam}">Book a viewing</a>
+              <p class="price">From <strong>${price(p.priceFrom)}</strong> <span>${cheapestUnit(p.rooms)}</span></p>
+              <a class="btn btn-primary btn-sm" href="contact.html?uni=${u.id}&property=${encodeURIComponent(p.name)}">Book a viewing</a>
             </div>
           </li>`;
       }
@@ -709,20 +628,19 @@
       function render() {
         const q = state.q.trim().toLowerCase();
         const results = D.universities
+          .filter((u) => state.city === "All" || u.city === state.city)
           .filter((u) => !state.uni || u.id === state.uni)
-          .filter(inArea)
-          .map((u) => ({
-            ...u,
-            properties: u.properties
-              .filter((p) => !q || [u.name, u.short, u.city, u.area, p.name, p.nearest].join(" ").toLowerCase().includes(q))
-              .map((p) => ({ ...p, matched: p.rooms.map(roomByName).filter((rt) => roomFits(rt, state)) }))
-              .filter((p) => p.matched.length)
-          }))
+          .filter((u) => !q || [u.name, u.short, u.city, u.area, ...u.properties.map((p) => p.name)].join(" ").toLowerCase().includes(q))
+          .map((u) => ({ ...u, properties: u.properties.filter((p) => !state.room || p.rooms.includes(state.room)) }))
           .filter((u) => u.properties.length);
 
         const n = results.reduce((a, u) => a + u.properties.length, 0);
         count.textContent = `${n} ${n === 1 ? "property" : "properties"} near ${results.length} ${results.length === 1 ? "university" : "universities"}`;
-        clearBtn.hidden = !anyFilterOn();
+
+        const activeUni = state.uni && D.universities.find((u) => u.id === state.uni);
+        $("#loc-active").innerHTML = activeUni
+          ? `<span class="pill is-on">${esc(activeUni.name)} <button type="button" aria-label="Clear university filter" data-clear-uni>${icon("x")}</button></span>`
+          : "";
 
         list.innerHTML = results.length
           ? results.map((u) => `
@@ -739,21 +657,32 @@
                 <ul class="properties">${u.properties.map((p) => propertyRow(p, u)).join("")}</ul>
               </div>
             </article>`).join("")
-          : `<div class="empty">${icon("search")}<h3>No rooms match those filters</h3><p>Try a different location, sharing option or a wider budget, or <a href="contact.html">tell us what you need</a> and we'll help you find something.</p><button class="btn btn-outline" type="button" data-reset>Clear all filters</button></div>`;
+          : `<div class="empty">${icon("search")}<h3>No rooms match those filters</h3><p>Try a different city or room type, or <a href="contact.html">tell us what you need</a> and we'll help you find something.</p><button class="btn btn-outline" type="button" data-reset>Clear all filters</button></div>`;
       }
 
-      const update = () => { syncControls(); syncUrl(); render(); };
-
-      form.addEventListener("submit", (e) => e.preventDefault());
-      qInput.addEventListener("input", (e) => { state.q = e.target.value; syncUrl(); render(); });
-      selects.forEach(([sel, key]) => sel.addEventListener("change", () => { state[key] = sel.value; update(); }));
       document.addEventListener("click", (e) => {
-        if (!e.target.closest("[data-reset]")) return;
-        Object.keys(state).forEach((k) => (state[k] = ""));
-        update();
+        const c = e.target.closest("[data-city]");
+        if (c) {
+          state.city = c.dataset.city;
+          $$("[data-city]").forEach((b) => b.setAttribute("aria-pressed", String(b === c)));
+          render();
+        }
+        if (e.target.closest("[data-clear-uni]")) {
+          state.uni = "";
+          history.replaceState(null, "", "locations.html");
+          render();
+        }
+        if (e.target.closest("[data-reset]")) {
+          Object.assign(state, { city: "All", q: "", uni: "", room: "" });
+          $("#loc-q").value = "";
+          roomSel.value = "";
+          $$("[data-city]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.city === "All")));
+          history.replaceState(null, "", "locations.html");
+          render();
+        }
       });
-
-      syncControls();
+      $("#loc-q").addEventListener("input", (e) => { state.q = e.target.value; render(); });
+      roomSel.addEventListener("change", (e) => { state.room = e.target.value; render(); });
       render();
     },
 
