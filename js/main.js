@@ -773,7 +773,8 @@
         try {
           if (C.formEndpoint) {
             const res = await fetch(C.formEndpoint, { method: "POST", body: new FormData(form), headers: { Accept: "application/json" } });
-            if (!res.ok) throw new Error("Request failed");
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok || String(data.success) === "false") throw new Error(data.message || "Request failed");
           } else {
             await new Promise((r) => setTimeout(r, 600)); // demo mode
           }

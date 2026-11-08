@@ -34,10 +34,11 @@ window.UKGHAR = {
       instagram: "https://instagram.com/",
       youtube: "https://youtube.com/"
     },
-    /* When you go live, create a free form at https://formspree.io and paste
-       the endpoint here (e.g. "https://formspree.io/f/abcdwxyz").
+    /* Enquiries are emailed for free by FormSubmit (https://formsubmit.co).
+       Format: "https://formsubmit.co/ajax/YOUR-EMAIL" (or the private alias
+       FormSubmit gives you after activation, to keep your email out of the code).
        Leave empty "" to keep forms in demo mode (shows a success message only). */
-    formEndpoint: "",
+    formEndpoint: "https://formsubmit.co/ajax/bibek.contact1@gmail.com",
     announcement: "Rooms available now for 2026/27, and 2027/28 bookings are open. All bills included."
   },
 
