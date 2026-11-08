@@ -19,7 +19,7 @@ window.UKGHAR = {
     tagline: "London student homes, sorted.",
     phone: "+44 7344 847781",
     whatsapp: "447344847781", // digits only, international format, used for the WhatsApp link
-    email: "hello@ukghar.co.uk",
+    email: "bibek.contact1@gmail.com",
     address: "120 Gray's Inn Road, London WC1X 8AL",
     officeHours: [
       { days: "Monday – Friday", time: "9:00am – 6:00pm" },

@@ -183,7 +183,7 @@
             <h3>Get in touch</h3>
             <ul class="footer-contact">
               <li>${icon("phone")}<a href="tel:${C.phone.replace(/[^+\d]/g, "")}">${esc(C.phone)}</a></li>
-              <li>${icon("mail")}<a href="mailto:${C.email}">${esc(C.email)}</a></li>
+              <li>${icon("mail")}<a href="mailto:${C.email}?subject=${encodeURIComponent("UKGhar enquiry")}">${esc(C.email)}</a></li>
               <li>${icon("pin")}<span>${esc(C.address)}</span></li>
             </ul>
             <form class="newsletter" novalidate>
@@ -726,7 +726,7 @@
       mount("contact-details", `
         <li>${icon("phone")}<div><strong>Call us</strong><a href="tel:${C.phone.replace(/[^+\d]/g, "")}">${esc(C.phone)}</a></div></li>
         <li>${icon("whatsapp")}<div><strong>WhatsApp</strong><a href="https://wa.me/${C.whatsapp}" target="_blank" rel="noopener">Message us</a></div></li>
-        <li>${icon("mail")}<div><strong>Email</strong><a href="mailto:${C.email}">${esc(C.email)}</a></div></li>
+        <li>${icon("mail")}<div><strong>Email</strong><a href="mailto:${C.email}?subject=${encodeURIComponent("UKGhar enquiry")}">${esc(C.email)}</a></div></li>
         <li>${icon("pin")}<div><strong>Office</strong><span>${esc(C.address)}</span></div></li>`);
       mount("contact-hours", C.officeHours.map((h) => `<li><span>${esc(h.days)}</span><span>${esc(h.time)}</span></li>`).join(""));
       const map = $("#contact-map");
