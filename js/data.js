@@ -26,6 +26,9 @@ window.UKGHAR = {
       { days: "Saturday", time: "10:00am – 4:00pm" },
       { days: "Emergencies", time: "24/7 for residents" }
     ],
+    /* Country picked by default in the enquiry form's phone number box
+       (2-letter code, e.g. "NP" Nepal, "GB" United Kingdom, "IN" India) */
+    defaultPhoneCountry: "NP",
     currency: "£",
     priceUnit: "per month",
     mapEmbed: "https://www.google.com/maps?q=Gray's+Inn+Road,London+WC1X&output=embed",
@@ -81,11 +84,11 @@ window.UKGHAR = {
 
   /* ---------- What we do / Services ---------- */
   services: [
+    { icon: "bus", title: "Free airport pickup", text: "Arriving from abroad? We'll meet you at Heathrow or Gatwick and bring you to your new home on move-in day, free of charge." },
     { icon: "home", title: "Fully furnished rooms", text: "Move in with just your suitcase. Bed, mattress, desk, chair, wardrobe and storage are already there." },
     { icon: "zap", title: "All bills included", text: "Energy, Wi-Fi, water and contents insurance in one monthly price. No meters, no surprise bills." },
     { icon: "shield", title: "No UK guarantor? No problem", text: "International students can book without a UK guarantor through our flexible payment plans." },
     { icon: "key", title: "Viewings & easy booking", text: "Book an in-person viewing or a live video tour, then reserve online in minutes." },
-    { icon: "bus", title: "Heathrow & Gatwick pickup", text: "Arriving from abroad? We'll meet you at the airport and bring you to your new home on move-in day." },
     { icon: "phone", title: "24/7 support", text: "A residence team on site and a support line that's always answered, day or night." }
   ],
 

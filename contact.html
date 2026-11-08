@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/styles.css?v=2026-11-08">
 </head>
 <body data-page="contact">
   <div id="site-header"></div>
@@ -39,15 +39,19 @@
             <h2 style="font-size:1.6rem">Your enquiry</h2>
             <p class="muted">All fields are required unless marked optional.</p>
             <div class="form-grid">
-              <div class="field">
+              <div class="field full">
                 <label for="f-name">Full name</label>
                 <span class="field-error" aria-live="polite"></span>
                 <input class="input" id="f-name" name="name" autocomplete="name" required data-validate data-label="full name">
               </div>
-              <div class="field">
+              <div class="field full">
                 <label for="f-phone">Phone number</label>
                 <span class="field-error" aria-live="polite"></span>
-                <input class="input" id="f-phone" name="phone" type="tel" autocomplete="tel" required data-validate data-label="phone number">
+                <div class="phone-group">
+                  <label for="f-country" class="visually-hidden">Country code</label>
+                  <select class="select" id="f-country" autocomplete="tel-country-code"></select>
+                  <input class="input" id="f-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel-national" placeholder="Mobile number" required data-validate data-label="phone number">
+                </div>
               </div>
               <div class="field full">
                 <label for="f-email">Email address</label>
@@ -123,7 +127,7 @@
 
   <div id="site-footer"></div>
 
-  <script src="js/data.js"></script>
-  <script src="js/main.js"></script>
+  <script src="js/data.js?v=2026-11-08"></script>
+  <script src="js/main.js?v=2026-11-08"></script>
 </body>
 </html>
