@@ -21,32 +21,47 @@
         <ol class="breadcrumbs"><li><a href="index.html">Home</a></li><li aria-current="page">Universities</li></ol>
         <p class="eyebrow">Universities &amp; locations</p>
         <h1>Find your room near campus</h1>
-        <p class="lead">Search by university, area or room type. Every price includes bills.</p>
+        <p class="lead">Filter by university, location, sharing and budget. Every price includes bills.</p>
       </div>
     </section>
 
     <section class="section" style="padding-top:0">
       <div class="container">
-        <div class="filters">
-          <div class="filters-row">
-            <div class="field">
-              <label for="loc-q" class="visually-hidden">Search universities or areas</label>
-              <div class="search-input">
-                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                <input class="input" id="loc-q" type="search" placeholder="Search a university, area or property">
-              </div>
-            </div>
-            <div class="field">
-              <label for="loc-room" class="visually-hidden">Room type</label>
-              <select class="select" id="loc-room"></select>
+        <form class="filters" id="loc-filters" role="search" aria-label="Filter rooms">
+          <div class="field">
+            <label for="loc-q" class="visually-hidden">Search universities, areas, stations or properties</label>
+            <div class="search-input">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input class="input" id="loc-q" type="search" placeholder="Search a university, area, station or property">
             </div>
           </div>
-          <div class="pills" id="loc-cities" role="group" aria-label="Filter by area"></div>
-        </div>
+          <div class="filters-grid">
+            <div class="field">
+              <label for="loc-uni">University</label>
+              <select class="select" id="loc-uni"></select>
+            </div>
+            <div class="field">
+              <label for="loc-area">Preferred location</label>
+              <select class="select" id="loc-area"></select>
+            </div>
+            <div class="field">
+              <label for="loc-sharing">Sharing</label>
+              <select class="select" id="loc-sharing"></select>
+            </div>
+            <div class="field">
+              <label for="loc-min">Min price <span class="muted">/ month</span></label>
+              <select class="select" id="loc-min"></select>
+            </div>
+            <div class="field">
+              <label for="loc-max">Max price <span class="muted">/ month</span></label>
+              <select class="select" id="loc-max"></select>
+            </div>
+          </div>
+        </form>
 
         <div class="results-bar">
           <p id="loc-count" aria-live="polite"></p>
-          <div id="loc-active"></div>
+          <button class="btn btn-ghost btn-sm" type="button" id="loc-clear" data-reset hidden>Clear all filters</button>
         </div>
 
         <div class="loc-list" id="loc-list"></div>
