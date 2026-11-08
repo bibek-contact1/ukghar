@@ -1,0 +1,9 @@
+{
+  "name": "ukghar",
+  "version": "1.0.0",
+  "description": "UKGhar — student accommodation website (static frontend)",
+  "private": true,
+  "scripts": {
+    "start": "node server.js"
+  }
+}

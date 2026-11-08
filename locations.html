@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Universities &amp; locations | UKGhar</title>
+  <meta name="description" content="Find UKGhar student rooms near University of East London, BPP, Coventry University London, University of West London, Roehampton and York St John London.">
+  <meta name="theme-color" content="#13204a">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body data-page="locations">
+  <div id="site-header"></div>
+
+  <main id="main">
+    <section class="page-hero">
+      <div class="container">
+        <ol class="breadcrumbs"><li><a href="index.html">Home</a></li><li aria-current="page">Universities</li></ol>
+        <p class="eyebrow">Universities &amp; locations</p>
+        <h1>Find your room near campus</h1>
+        <p class="lead">Search by university, area or room type. Every price includes bills.</p>
+      </div>
+    </section>
+
+    <section class="section" style="padding-top:0">
+      <div class="container">
+        <div class="filters">
+          <div class="filters-row">
+            <div class="field">
+              <label for="loc-q" class="visually-hidden">Search universities or areas</label>
+              <div class="search-input">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input class="input" id="loc-q" type="search" placeholder="Search a university, area or property">
+              </div>
+            </div>
+            <div class="field">
+              <label for="loc-room" class="visually-hidden">Room type</label>
+              <select class="select" id="loc-room"></select>
+            </div>
+          </div>
+          <div class="pills" id="loc-cities" role="group" aria-label="Filter by area"></div>
+        </div>
+
+        <div class="results-bar">
+          <p id="loc-count" aria-live="polite"></p>
+          <div id="loc-active"></div>
+        </div>
+
+        <div class="loc-list" id="loc-list"></div>
+      </div>
+    </section>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script src="js/data.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
