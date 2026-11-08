@@ -264,7 +264,10 @@ a.card:hover .media img { transform: scale(1.04); }
 .uni-card .muted { font-size: .92rem; margin-bottom: 12px; }
 
 /* Rooms */
-.room-card { display: flex; flex-direction: column; }
+.room-card { display: flex; flex-direction: column; cursor: pointer; transition: transform .2s, box-shadow .2s; }
+.room-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+.room-card:hover .room-title { color: var(--brand-dark); }
+.room-card:hover .room-open-hint { opacity: 1; }
 .room-card .card-body { display: flex; flex-direction: column; flex: 1; }
 .room-foot { margin-top: auto; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding-top: 16px; border-top: 1px solid var(--line); }
 
@@ -385,7 +388,10 @@ a.card:hover .media img { transform: scale(1.04); }
 @media (max-width: 860px) { .loc-card { grid-template-columns: 1fr; } .loc-media { aspect-ratio: 16 / 9; min-height: 0; } }
 .properties { list-style: none; padding: 0; margin: 12px 0 0; display: grid; gap: 12px; }
 .property { display: flex; justify-content: space-between; gap: 20px; padding: 18px; border-radius: 14px; background: var(--bg); border: 1px solid var(--line); flex-wrap: wrap; }
-.property h4 { margin-bottom: 6px; }
+.property[data-href] { cursor: pointer; transition: border-color .2s, box-shadow .2s, background .2s; }
+.property[data-href]:hover { border-color: var(--navy); background: #fff; box-shadow: var(--shadow); }
+.property[data-href]:hover h4 { color: var(--brand-dark); }
+.property h4 { margin-bottom: 6px; transition: color .2s; }
 .property-main { flex: 1 1 260px; }
 .property-side { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; text-align: right; }
 @media (max-width: 560px) { .property-side { align-items: flex-start; text-align: left; } }

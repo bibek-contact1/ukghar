@@ -307,7 +307,7 @@
     const count = mediaCount(r);
     const hasVid = (r.videos || []).length > 0;
     return `
-    <article class="card room-card">
+    <article class="card room-card" data-room="${i}">
       <button type="button" class="media ratio-4x3 room-open" data-room="${i}" aria-label="View photos${hasVid ? " and videos" : ""} of the ${esc(r.name)}">
         ${img(r.image, r.name + " room")}${r.bestFor ? `<span class="badge">${esc(r.bestFor)}</span>` : ""}
         ${count ? `<span class="chip chip-float media-count">${icon(hasVid ? "camera" : "image")} ${count}</span>` : ""}
@@ -514,7 +514,8 @@
     };
 
     document.addEventListener("click", (e) => {
-      const t = e.target.closest(".room-open");
+      /* the photo, the title, or anywhere else on the card (except its links/buttons) opens the gallery */
+      const t = e.target.closest(".room-open") || (!e.target.closest("a, button") && e.target.closest(".room-card[data-room]"));
       if (t) { open(D.roomTypes[Number(t.dataset.room)], t); return; }
       if (modal.hidden) return;
       if (e.target.closest("[data-gclose]")) return close();
@@ -611,7 +612,7 @@
       function propertyRow(p, u) {
         const avClass = /left/i.test(p.availability) ? "warn" : /wait|coming/i.test(p.availability) ? "muted" : "ok";
         return `
-          <li class="property">
+          <li class="property" data-href="contact.html?uni=${u.id}&property=${encodeURIComponent(p.name)}">
             <div class="property-main">
               <h4>${esc(p.name)}</h4>
               <p class="meta">${icon("clock")} ${esc(p.distance)} to campus${p.nearest ? ` <span class="dot"></span> ${icon("pin")} ${esc(p.nearest)}` : ""}${p.gender ? ` <span class="dot"></span> ${icon("users")} ${esc(p.gender)}` : ""}</p>
@@ -661,6 +662,12 @@
       }
 
       document.addEventListener("click", (e) => {
+        /* clicking anywhere on a property row (not its button) opens its booking page */
+        const row = e.target.closest(".property[data-href]");
+        if (row && !e.target.closest("a, button") && !String(window.getSelection() || "")) {
+          location.href = row.dataset.href;
+          return;
+        }
         const c = e.target.closest("[data-city]");
         if (c) {
           state.city = c.dataset.city;
