@@ -39,7 +39,7 @@ window.UKGHAR = {
          e.g. "https://script.google.com/macros/s/AKfy.../exec"
        Also works: "https://formsubmit.co/ajax/YOUR-EMAIL"
        Leave empty "" to keep forms in demo mode (shows a success message only). */
-    formEndpoint: "https://formsubmit.co/ajax/bibek.contact1@gmail.com",
+    formEndpoint: "https://script.google.com/macros/s/AKfycbysPdNOiR6ME1l8oPxAfLSbKfi47z3gLYMYnjhZSIvTqAU33tAlwZC551XB4XtnzK3F/exec",
     announcement: "Rooms available now for 2026/27, and 2027/28 bookings are open. All bills included."
   },
 
