@@ -31,7 +31,6 @@ function doPost(e) {
       ["Email", p.email],
       ["University", p.university],
       ["Room type", p.room],
-      ["Viewing type", p.viewing],
       ["Preferred date", p.date],
       ["Message", p.message]
     ].filter(function (f) { return f[1]; });
