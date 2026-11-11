@@ -30,6 +30,10 @@
     return el;
   };
   const allRoomTypes = () => D.roomTypes.map((r) => r.name);
+  /* Each room type gets its own details page: room.html?type=twin-studio */
+  const roomSlug = (r) => r.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  const roomUrl = (r) => `room.html?type=${roomSlug(r)}`;
+  const roomByName = (name) => D.roomTypes.find((r) => r.name === name);
   /* "per month" or "per person / month" depending on the room type */
   const roomUnit = (r) => (r && r.perPerson ? "per person / month" : C.priceUnit);
   /* unit for the cheapest room type in a list of room-type names */
@@ -121,8 +125,9 @@
   ];
 
   function renderHeader() {
+    const navKey = page === "room" ? "facilities" : page; // room details sit under "Rooms & facilities"
     const links = NAV.map(
-      (n) => `<li><a href="${n.href}"${n.key === page ? ' aria-current="page"' : ""}>${n.label}</a></li>`
+      (n) => `<li><a href="${n.href}"${n.key === navKey ? ' aria-current="page"' : ""}>${n.label}</a></li>`
     ).join("");
     mount(
       "site-header",
@@ -325,22 +330,22 @@
   };
 
   const roomCard = (r) => {
-    const i = D.roomTypes.indexOf(r);
+    const url = roomUrl(r);
     const count = mediaCount(r);
     const hasVid = (r.videos || []).length > 0;
     return `
-    <article class="card room-card" data-room="${i}">
-      <button type="button" class="media ratio-4x3 room-open" data-room="${i}" aria-label="View photos${hasVid ? " and videos" : ""} of the ${esc(r.name)}">
-        ${img(r.image, r.name + " room")}${r.bestFor ? `<span class="badge">${esc(r.bestFor)}</span>` : ""}
+    <article class="card room-card" data-href="${url}">
+      <a class="media ratio-4x3 room-open" href="${url}" tabindex="-1" aria-hidden="true">
+        ${img(r.image, "")}${r.bestFor ? `<span class="badge">${esc(r.bestFor)}</span>` : ""}
         ${count ? `<span class="chip chip-float media-count">${icon(hasVid ? "camera" : "image")} ${count}</span>` : ""}
-        <span class="room-open-hint">${icon("image")} View photos${hasVid ? " &amp; videos" : ""}</span>
-      </button>
+        <span class="room-open-hint">View room details ${icon("arrow")}</span>
+      </a>
       <div class="card-body">
-        <h3><button type="button" class="room-open room-title" data-room="${i}">${esc(r.name)}</button></h3>
+        <h3><a class="room-title" href="${url}">${esc(r.name)}</a></h3>
         <ul class="ticks">${r.features.map((f) => `<li>${icon("check")}${esc(f)}</li>`).join("")}</ul>
         <div class="room-foot">
           <p class="price">From <strong>${price(r.priceFrom)}</strong> <span>${roomUnit(r)}</span></p>
-          <a class="btn btn-outline btn-sm" href="contact.html?room=${encodeURIComponent(r.name)}">Enquire</a>
+          <a class="btn btn-outline btn-sm" href="${url}" tabindex="-1" aria-hidden="true">View details</a>
         </div>
       </div>
     </article>`;
@@ -506,7 +511,7 @@
       thumbs.hidden = !multi;
     };
 
-    const open = (r, trigger) => {
+    const open = (r, trigger, start = 0) => {
       room = r;
       lastFocus = trigger;
       const photos = r.photos && r.photos.length ? r.photos : [{ src: r.image, caption: "" }];
@@ -523,7 +528,7 @@
       $(".gallery-cta .price", modal).innerHTML = `From <strong>${price(r.priceFrom)}</strong> <span>${roomUnit(r)}</span>`;
       $(".gallery-cta a", modal).href = `contact.html?room=${encodeURIComponent(r.name)}`;
       modal.hidden = false;
-      show(0);
+      show(Math.min(start, items.length - 1));
       document.body.classList.add("modal-open");
       $(".modal-close", modal).focus();
     };
@@ -536,9 +541,9 @@
     };
 
     document.addEventListener("click", (e) => {
-      /* the photo, the title, or anywhere else on the card (except its links/buttons) opens the gallery */
-      const t = e.target.closest(".room-open") || (!e.target.closest("a, button") && e.target.closest(".room-card[data-room]"));
-      if (t) { open(D.roomTypes[Number(t.dataset.room)], t); return; }
+      /* photo tiles / "View all photos" on a room details page open the full-screen gallery */
+      const t = e.target.closest("[data-gallery]");
+      if (t) { open(D.roomTypes[Number(t.dataset.gallery)], t, Number(t.dataset.start) || 0); return; }
       if (modal.hidden) return;
       if (e.target.closest("[data-gclose]")) return close();
       if (e.target.closest(".gallery-nav.prev")) return show(idx - 1);
@@ -638,7 +643,7 @@
             <div class="property-main">
               <h4>${esc(p.name)}</h4>
               <p class="meta">${icon("clock")} ${esc(p.distance)} to campus${p.nearest ? ` <span class="dot"></span> ${icon("pin")} ${esc(p.nearest)}` : ""}${p.gender ? ` <span class="dot"></span> ${icon("users")} ${esc(p.gender)}` : ""}</p>
-              <div class="tags">${p.rooms.map((r) => `<span class="tag">${esc(r)}</span>`).join("")}</div>
+              <div class="tags">${p.rooms.map((name) => { const rt = roomByName(name); return rt ? `<a class="tag" href="${roomUrl(rt)}">${esc(name)}</a>` : `<span class="tag">${esc(name)}</span>`; }).join("")}</div>
             </div>
             <div class="property-side">
               <span class="status status-${avClass}">${esc(p.availability)}</span>
@@ -684,12 +689,6 @@
       }
 
       document.addEventListener("click", (e) => {
-        /* clicking anywhere on a property row (not its button) opens its booking page */
-        const row = e.target.closest(".property[data-href]");
-        if (row && !e.target.closest("a, button") && !String(window.getSelection() || "")) {
-          location.href = row.dataset.href;
-          return;
-        }
         const c = e.target.closest("[data-city]");
         if (c) {
           state.city = c.dataset.city;
@@ -733,6 +732,158 @@
           <span>${esc(i.item)}${i.note ? `<small>${esc(i.note)}</small>` : ""}</span>
           <span class="inc-label">${i.included ? "Included" : "Optional"}</span>
         </li>`).join(""));
+    },
+
+    room() {
+      const slug = new URLSearchParams(location.search).get("type") || "";
+      const r = D.roomTypes.find((t) => roomSlug(t) === slug);
+      const main = $("#room-page");
+      if (!r) {
+        document.title = "Room not found | UKGhar";
+        main.innerHTML = `
+          <section class="section"><div class="container">
+            <div class="empty">${icon("search")}<h1 class="h3">We couldn't find that room</h1>
+              <p>It may have been renamed or is no longer available.</p>
+              <a class="btn btn-primary" href="facilities.html">See all room types</a></div>
+          </div></section>`;
+        return;
+      }
+      const i = D.roomTypes.indexOf(r);
+      const enquire = `contact.html?room=${encodeURIComponent(r.name)}`;
+      document.title = `${r.name} | UKGhar`;
+      const metaDesc = $('meta[name="description"]');
+      if (metaDesc) metaDesc.content = `${r.name} from ${price(r.priceFrom)} ${roomUnit(r)}, bills included. ${r.description || r.features.join(". ")}`;
+
+      /* Photo mosaic: photos first, then videos (same order as the full-screen gallery) */
+      const photos = r.photos && r.photos.length ? r.photos : [{ src: r.image, caption: "" }];
+      const media = [
+        ...photos.map((p) => ({ type: "photo", thumb: p.src, caption: p.caption })),
+        ...(r.videos || []).map((v) => ({ type: "video", thumb: v.poster || (v.youtube ? `https://img.youtube.com/vi/${encodeURIComponent(v.youtube)}/hqdefault.jpg` : ""), caption: v.caption }))
+      ];
+      const shown = media.length >= 5 ? 5 : media.length >= 3 ? 3 : media.length;
+      const tile = (m, k) => `
+        <button type="button" class="mosaic-tile${k === 0 ? " is-main" : ""}" data-gallery="${i}" data-start="${k}" aria-label="Open ${m.type} ${k + 1} of ${media.length}${m.caption ? ": " + esc(m.caption) : ""}">
+          ${m.thumb ? img(m.thumb, "") : ""}${m.type === "video" ? `<span class="thumb-play">${icon("play")}</span>` : ""}
+        </button>`;
+
+      /* Every property that offers this room type */
+      const where = D.universities.flatMap((u) => u.properties.filter((p) => p.rooms.includes(r.name)).map((p) => ({ u, p })));
+      const avClass = (a) => (/left/i.test(a) ? "warn" : /wait|coming/i.test(a) ? "muted" : "ok");
+      const facts = [
+        { icon: "users", label: "Sleeps", value: r.sleeps },
+        { icon: "bed", label: "Bed", value: r.bed },
+        { icon: "droplet", label: "Bathroom", value: r.bathroom },
+        { icon: "utensils", label: "Kitchen", value: r.kitchen },
+        { icon: "calendar", label: "Contract", value: C.contractLengths },
+        { icon: "zap", label: "Bills", value: "All included" }
+      ].filter((f) => f.value);
+      const seen = new Set();
+      const amenities = D.facilities.filter((g) => g.group !== "In your room").flatMap((g) => g.items).filter((f) => !seen.has(f.title) && seen.add(f.title));
+      const others = D.roomTypes.filter((t) => t !== r).sort((a, b) => Math.abs(a.priceFrom - r.priceFrom) - Math.abs(b.priceFrom - r.priceFrom)).slice(0, 3);
+
+      main.innerHTML = `
+        <section class="room-top">
+          <div class="container">
+            <ol class="breadcrumbs"><li><a href="index.html">Home</a></li><li><a href="facilities.html">Rooms &amp; facilities</a></li><li aria-current="page">${esc(r.name)}</li></ol>
+            <div class="room-head">
+              <div>
+                ${r.bestFor ? `<p class="eyebrow">${icon("star")} ${esc(r.bestFor)}</p>` : ""}
+                <h1>${esc(r.name)}</h1>
+                <p class="meta">${r.sleeps ? `${icon("users")} Sleeps ${esc(r.sleeps)}` : ""}${where.length ? ` <span class="dot"></span> ${icon("pin")} Available at ${where.length} ${where.length === 1 ? "property" : "properties"}` : ""} <span class="dot"></span> ${icon("zap")} Bills included</p>
+              </div>
+              <p class="price room-head-price">From <strong>${price(r.priceFrom)}</strong> <span>${roomUnit(r)}</span></p>
+            </div>
+            <div class="mosaic" data-n="${shown}">
+              ${media.slice(0, shown).map(tile).join("")}
+              ${media.length > 1 ? `<button type="button" class="btn btn-light btn-sm mosaic-all" data-gallery="${i}" data-start="0">${icon("image")} View all ${mediaCount(r) || media.length + " photos"}</button>` : ""}
+            </div>
+          </div>
+        </section>
+
+        <section class="section room-body">
+          <div class="container room-layout">
+            <div class="room-main">
+              <section class="room-block" aria-labelledby="rb-about">
+                <h2 id="rb-about">About this room</h2>
+                ${r.description ? `<p class="room-desc">${esc(r.description)}</p>` : ""}
+                <dl class="facts">${facts.map((f) => `<div><dt>${icon(f.icon)} ${esc(f.label)}</dt><dd>${esc(f.value)}</dd></div>`).join("")}</dl>
+              </section>
+
+              <section class="room-block" aria-labelledby="rb-features">
+                <h2 id="rb-features">Room features</h2>
+                <ul class="ticks ticks-2">${[...r.features, "Fully furnished, just bring your suitcase", "Ultrafast Wi-Fi in the room"].map((f) => `<li>${icon("check")}${esc(f)}</li>`).join("")}</ul>
+              </section>
+
+              <section class="room-block" aria-labelledby="rb-included">
+                <h2 id="rb-included">What's included in your rent</h2>
+                <p class="muted">One clear monthly price: no meter top-ups, no surprise Wi-Fi bills, no hidden admin fees.</p>
+                <ul class="included">${D.included.map((x) => `
+                  <li class="${x.included ? "yes" : "no"}">
+                    <span class="inc-icon">${icon(x.included ? "check" : "x")}</span>
+                    <span>${esc(x.item)}${x.note ? `<small>${esc(x.note)}</small>` : ""}</span>
+                    <span class="inc-label">${x.included ? "Included" : "Optional"}</span>
+                  </li>`).join("")}</ul>
+              </section>
+
+              <section class="room-block" aria-labelledby="rb-where">
+                <h2 id="rb-where">Where you can live in a ${esc(r.name.toLowerCase())}</h2>
+                ${where.length ? `<ul class="properties">${where.map(({ u, p }) => {
+                  const href = `contact.html?uni=${u.id}&room=${encodeURIComponent(r.name)}&property=${encodeURIComponent(p.name)}`;
+                  return `
+                  <li class="property" data-href="${href}">
+                    <div class="property-main">
+                      <h3 class="h4">${esc(p.name)}</h3>
+                      <p class="meta">${icon("cap")} ${esc(u.name)}</p>
+                      <p class="meta">${icon("clock")} ${esc(p.distance)} to campus${p.nearest ? ` <span class="dot"></span> ${icon("pin")} ${esc(p.nearest)}` : ""}${p.gender ? ` <span class="dot"></span> ${icon("users")} ${esc(p.gender)}` : ""}</p>
+                    </div>
+                    <div class="property-side">
+                      <span class="status status-${avClass(p.availability)}">${esc(p.availability)}</span>
+                      <a class="btn btn-primary btn-sm" href="${href}">Book a viewing</a>
+                    </div>
+                  </li>`;
+                }).join("")}</ul>` : `<p class="muted">This room type isn't listed at a property right now. <a href="${enquire}">Ask us</a> and we'll let you know when one becomes available.</p>`}
+              </section>
+
+              <section class="room-block" aria-labelledby="rb-facilities">
+                <h2 id="rb-facilities">Building facilities</h2>
+                <p class="muted">Some facilities vary by property. Ask us about the one you're interested in.</p>
+                <ul class="amenities">${amenities.map((f) => `<li>${icon(f.icon)}<span><strong>${esc(f.title)}</strong>${esc(f.text)}</span></li>`).join("")}</ul>
+              </section>
+
+              <section class="room-block" aria-labelledby="rb-faq">
+                <h2 id="rb-faq">Questions about renting</h2>
+                ${faqHTML()}
+              </section>
+            </div>
+
+            <aside class="room-aside" aria-label="Book this room">
+              <div class="card book-card">
+                <p class="price">From <strong>${price(r.priceFrom)}</strong> <span>${roomUnit(r)}</span></p>
+                <p class="book-note">${icon("check")} All bills included</p>
+                <a class="btn btn-primary btn-block" href="${enquire}">Enquire about this room</a>
+                <a class="btn btn-ghost btn-block" href="https://wa.me/${C.whatsapp}?text=${encodeURIComponent(`Hi UKGhar, I'm interested in the ${r.name}.`)}" target="_blank" rel="noopener">${icon("whatsapp")} Ask on WhatsApp</a>
+                <a class="btn btn-ghost btn-block" href="tel:${C.phone.replace(/[^+\d]/g, "")}">${icon("phone")} Call ${esc(C.phone)}</a>
+                <ul class="ticks book-trust">
+                  <li>${icon("check")}Free airport pickup</li>
+                  <li>${icon("check")}No UK guarantor needed</li>
+                  <li>${icon("check")}In-person or video viewings</li>
+                </ul>
+              </div>
+            </aside>
+          </div>
+        </section>
+
+        <section class="section section-white">
+          <div class="container">
+            ${sectionHead("Compare", "Other room types", "", { href: "facilities.html", label: "See all rooms" })}
+            <div class="grid grid-3">${others.map(roomCard).join("")}</div>
+          </div>
+        </section>
+
+        <div class="book-bar">
+          <p class="price">From <strong>${price(r.priceFrom)}</strong> <span>${roomUnit(r)}</span></p>
+          <a class="btn btn-primary" href="${enquire}">Enquire</a>
+        </div>`;
     },
 
     community() {
@@ -844,6 +995,17 @@
     }, { rootMargin: "0px 0px -60px 0px" });
     els.forEach((el) => io.observe(el));
   }
+
+  /* Clicking anywhere on a room card or property row (not on its own links/buttons)
+     opens its page. Ctrl/Cmd-click or middle-click opens it in a new tab. */
+  const openRow = (e) => {
+    const row = e.target.closest("[data-href]");
+    if (!row || e.target.closest("a, button, input, select, textarea, label") || String(window.getSelection() || "")) return;
+    if (e.ctrlKey || e.metaKey || e.button === 1) window.open(row.dataset.href, "_blank", "noopener");
+    else if (e.button === 0) location.href = row.dataset.href;
+  };
+  document.addEventListener("click", openRow);
+  document.addEventListener("auxclick", openRow);
 
   /* Broken images fall back to the branded gradient behind them */
   document.addEventListener("error", (e) => {

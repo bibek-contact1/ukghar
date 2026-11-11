@@ -31,6 +31,7 @@ window.UKGHAR = {
     defaultPhoneCountry: "NP",
     currency: "£",
     priceUnit: "per month",
+    contractLengths: "44 or 51 weeks", // shown on each room's details page
     mapEmbed: "https://www.google.com/maps?q=Gray's+Inn+Road,London+WC1X&output=embed",
     social: {
       facebook: "https://facebook.com/",
@@ -178,6 +179,8 @@ window.UKGHAR = {
 
   /* ---------- Room types (prices are PER MONTH) ----------
      perPerson: true  -> price is shown as "per person / month"
+     description: a short paragraph shown on the room's own details page
+     sleeps / bed / bathroom / kitchen: the "Key facts" on the details page
      photos:  list of { src, caption }. Use your own: "assets/images/premium-1.jpg"
      videos:  list of videos shown in the room's gallery. Two ways:
                 { src: "assets/videos/premium-tour.mp4", caption: "Room tour" }
@@ -191,6 +194,11 @@ window.UKGHAR = {
       image: "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=900&q=70",
       features: ["Extra-large private studio, higher floor", "Own full kitchen & en-suite bathroom", "Double bed, desk & lounge area"],
       bestFor: "Extra space",
+      description: "A spacious private studio on a higher floor, with your own full kitchen and en-suite bathroom. Plenty of room to study, cook, relax and have friends over, all in one place and all to yourself.",
+      sleeps: "1 student",
+      bed: "Double bed",
+      bathroom: "Private en-suite",
+      kitchen: "Private full kitchen",
       photos: [
         { src: "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1400&q=75", caption: "Studio bedroom" },
         { src: "https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&w=1400&q=75", caption: "Double bed & lighting" },
@@ -208,6 +216,11 @@ window.UKGHAR = {
       image: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=900&q=70",
       features: ["Studio shared with one friend", "Two beds & two desks", "Private kitchenette & bathroom"],
       bestFor: "Live with a friend",
+      description: "A self-contained studio you share with one friend, partner or sibling. You each get your own bed and desk, and the kitchenette and bathroom are just for the two of you.",
+      sleeps: "2 students",
+      bed: "Two single beds",
+      bathroom: "Private (shared by 2)",
+      kitchen: "Private kitchenette",
       photos: [
         { src: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1400&q=75", caption: "Twin studio" },
         { src: "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?auto=format&fit=crop&w=1400&q=75", caption: "Sleeping area" },
@@ -224,6 +237,11 @@ window.UKGHAR = {
       image: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=900&q=70",
       features: ["Room shared by 2 students", "Own bed, desk & wardrobe each", "Shared kitchen & bathroom"],
       bestFor: "Most popular",
+      description: "Our most popular choice. You share a bright, comfortable room with one other student, each with your own bed, desk and wardrobe, and use the shared kitchen and bathrooms in the flat.",
+      sleeps: "2 students",
+      bed: "Single bed each",
+      bathroom: "Shared",
+      kitchen: "Shared kitchen",
       photos: [
         { src: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1400&q=75", caption: "Double sharing room" },
         { src: "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&w=1400&q=75", caption: "Beds & bedside storage" },
@@ -240,6 +258,11 @@ window.UKGHAR = {
       image: "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=900&q=70",
       features: ["Room shared by 3 students", "Own bed, desk & storage each", "Shared kitchen & bathroom"],
       bestFor: "Great value",
+      description: "A roomy shared room for three students, with your own bed, desk and storage. A great-value way to live close to campus and make friends from day one.",
+      sleeps: "3 students",
+      bed: "Single bed each",
+      bathroom: "Shared",
+      kitchen: "Shared kitchen",
       photos: [
         { src: "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=1400&q=75", caption: "Triple sharing room" },
         { src: "https://images.unsplash.com/photo-1566665797739-1674de7a421a?auto=format&fit=crop&w=1400&q=75", caption: "Sleeping area" },
@@ -255,6 +278,11 @@ window.UKGHAR = {
       image: "https://images.unsplash.com/photo-1493809842364-78817add7ffb?auto=format&fit=crop&w=900&q=70",
       features: ["Room shared by 4 students", "Own bed & storage each", "Shared kitchen, lounge & bathroom"],
       bestFor: "Budget friendly",
+      description: "A friendly shared room for four students. Everyone gets their own bed and storage, and you have a shared kitchen, lounge and bathrooms in the flat.",
+      sleeps: "4 students",
+      bed: "Single bed each",
+      bathroom: "Shared",
+      kitchen: "Shared kitchen & lounge",
       photos: [
         { src: "https://images.unsplash.com/photo-1493809842364-78817add7ffb?auto=format&fit=crop&w=1400&q=75", caption: "4-person sharing room" },
         { src: "https://images.unsplash.com/photo-1595526051245-4506e0005bd0?auto=format&fit=crop&w=1400&q=75", caption: "Sleeping area" },
@@ -271,6 +299,11 @@ window.UKGHAR = {
       image: "https://images.unsplash.com/photo-1540518614846-7eded433c457?auto=format&fit=crop&w=900&q=70",
       features: ["Room shared by 5 students", "Own bed & storage each", "Shared kitchen, lounge & bathroom"],
       bestFor: "Best value",
+      description: "Our best-value option. A large shared room for five students, each with their own bed and storage, plus a shared kitchen, lounge and bathrooms.",
+      sleeps: "5 students",
+      bed: "Single bed each",
+      bathroom: "Shared",
+      kitchen: "Shared kitchen & lounge",
       photos: [
         { src: "https://images.unsplash.com/photo-1540518614846-7eded433c457?auto=format&fit=crop&w=1400&q=75", caption: "5-person sharing room" },
         { src: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1400&q=75", caption: "Sleeping area" },

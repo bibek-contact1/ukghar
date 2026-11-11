@@ -34,7 +34,7 @@ Then open <http://localhost:3000>. Press `Ctrl + C` to stop.
 - **Phone, email, address, social links:** `company`
 - **Add a university:** copy one block inside `universities`, change its `id`, name, city and properties
 - **Prices / room types:** `roomTypes` and each property's `priceFrom` (prices are per month; set `perPerson: true` to show "per person / month")
-- **Room photos & videos:** each room type's `photos` and `videos` lists. Clicking a room opens its gallery.
+- **Room photos & videos:** each room type's `photos` and `videos` lists. Clicking a room opens its own details page (`room.html?type=twin-studio`), filled from that room's `description`, `sleeps`, `bed`, `bathroom`, `kitchen`, `features`, photos and the properties that list it.
 - **Facilities:** `facilities`, grouped into sections
 - **Events:** `events`; set `status` to `"upcoming"` or `"past"`
 - **FAQs, reviews, team, timeline:** their own sections
