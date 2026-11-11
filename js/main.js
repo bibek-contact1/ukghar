@@ -156,13 +156,16 @@
 
     const toggle = $(".menu-toggle");
     const mnav = $("#mobile-nav");
-    toggle.addEventListener("click", () => {
-      const open = toggle.getAttribute("aria-expanded") === "true";
-      toggle.setAttribute("aria-expanded", String(!open));
-      toggle.setAttribute("aria-label", open ? "Open menu" : "Close menu");
-      toggle.innerHTML = icon(open ? "menu" : "x");
-      mnav.hidden = open;
-      document.body.classList.toggle("nav-open", !open);
+    const setMenu = (open) => {
+      toggle.setAttribute("aria-expanded", String(open));
+      toggle.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+      toggle.innerHTML = icon(open ? "x" : "menu");
+      mnav.hidden = !open;
+      document.body.classList.toggle("nav-open", open);
+    };
+    toggle.addEventListener("click", () => setMenu(toggle.getAttribute("aria-expanded") !== "true"));
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && !mnav.hidden) { setMenu(false); toggle.focus(); }
     });
 
     const header = $(".header");
@@ -227,8 +230,7 @@
           <p>&copy; ${year} ${esc(C.name)}. All rights reserved.</p>
           <ul>
             <li><a href="#" data-open-cookies>Cookie settings</a></li>
-            <li><a href="contact.html">Privacy</a></li>
-            <li><a href="contact.html">Terms</a></li>
+            <li><a href="privacy.html">Privacy notice</a></li>
           </ul>
         </div>
       </footer>
@@ -236,19 +238,49 @@
     );
 
     const nl = $(".newsletter");
-    nl.addEventListener("submit", (e) => {
+    nl.addEventListener("submit", async (e) => {
       e.preventDefault();
       const input = $("#nl-email");
       const msg = $(".newsletter-msg");
+      const btn = $("button", nl);
       if (!input.checkValidity() || !input.value) {
         msg.textContent = "Please enter a valid email address.";
         msg.className = "newsletter-msg is-error";
         return;
       }
-      msg.textContent = "Thanks! You're on the list.";
-      msg.className = "newsletter-msg is-ok";
-      input.value = "";
+      btn.disabled = true;
+      try {
+        if (C.formEndpoint) {
+          /* Sent to the same enquiry script as the contact form (see email-setup/Code.gs) */
+          const body = new URLSearchParams({ form: "newsletter", name: "Newsletter signup", email: input.value.trim(), message: "Please add me to room alerts & event news." });
+          const res = await fetch(C.formEndpoint, { method: "POST", body, headers: { Accept: "application/json" } });
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok || String(data.success) === "false") throw new Error(data.message || "Request failed");
+        }
+        msg.textContent = "Thanks! You're on the list.";
+        msg.className = "newsletter-msg is-ok";
+        input.value = "";
+      } catch (err) {
+        msg.textContent = `Sorry, that didn't go through. Please email ${C.email} instead.`;
+        msg.className = "newsletter-msg is-error";
+      }
+      btn.disabled = false;
     });
+
+    /* Organisation details for search engines (filled from js/data.js) */
+    const ld = document.createElement("script");
+    ld.type = "application/ld+json";
+    ld.textContent = JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      name: C.name,
+      description: C.tagline,
+      telephone: C.phone,
+      email: C.email,
+      address: { "@type": "PostalAddress", streetAddress: C.address, addressLocality: "London", addressCountry: "GB" },
+      sameAs: Object.values(C.social).filter((u) => u && !/^https?:\/\/[^/]+\/?$/.test(u))
+    });
+    document.head.appendChild(ld);
   }
 
   /* ---------------- Cookie banner (UK-style consent) ---------------- */
@@ -261,7 +293,7 @@
     el.setAttribute("aria-label", "Cookie consent");
     el.innerHTML = `
       <div class="cookie-inner">
-        <p><strong>We use cookies</strong> to make this site work and to understand how it's used. You can accept all, or keep only the essential ones.</p>
+        <p><strong>We use cookies</strong> to make this site work. Embedded services such as Google Maps may set their own. You can accept all, or keep only the essential ones. <a href="privacy.html">Privacy notice</a></p>
         <div class="cookie-actions">
           <button class="btn btn-primary btn-sm" data-c="all">Accept all</button>
           <button class="btn btn-ghost btn-sm" data-c="essential">Essential only</button>
@@ -368,7 +400,7 @@
   function eventCard(ev) {
     const d = fmtDate(ev.date);
     return `
-      <article class="card event-card${ev.status === "past" ? " is-past" : ""}">
+      <article class="card event-card${isPast(ev) ? " is-past" : ""}">
         <div class="media ratio-16x10">${img(ev.image, ev.title)}
           <span class="date-badge"><b>${d.day}</b>${d.mon}</span>
           <span class="chip chip-float">${esc(ev.category)}</span>
@@ -400,8 +432,11 @@
     `<ol class="steps">${D.steps.map((s, i) => `
       <li><span class="step-num">${i + 1}</span><h3>${esc(s.title)}</h3><p>${esc(s.text)}</p></li>`).join("")}</ol>`;
 
-  const upcoming = () => D.events.filter((e) => e.status === "upcoming").sort((a, b) => a.date.localeCompare(b.date));
-  const past = () => D.events.filter((e) => e.status === "past").sort((a, b) => b.date.localeCompare(a.date));
+  /* Events move to "past" automatically the day after their date (status: "past" forces it) */
+  const todayISO = (() => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; })();
+  const isPast = (ev) => ev.status === "past" || ev.date < todayISO;
+  const upcoming = () => D.events.filter((e) => !isPast(e)).sort((a, b) => a.date.localeCompare(b.date));
+  const past = () => D.events.filter(isPast).sort((a, b) => b.date.localeCompare(a.date));
 
   /* ---------------- Video modal ---------------- */
   function setupVideoModal() {
@@ -763,7 +798,9 @@
       const shown = media.length >= 5 ? 5 : media.length >= 3 ? 3 : media.length;
       const tile = (m, k) => `
         <button type="button" class="mosaic-tile${k === 0 ? " is-main" : ""}" data-gallery="${i}" data-start="${k}" aria-label="Open ${m.type} ${k + 1} of ${media.length}${m.caption ? ": " + esc(m.caption) : ""}">
-          ${m.thumb ? img(m.thumb, "") : ""}${m.type === "video" ? `<span class="thumb-play">${icon("play")}</span>` : ""}
+          ${m.thumb ? (k === 0
+            ? `<img src="${esc(m.thumb)}" alt="" fetchpriority="high" decoding="async">` /* main photo loads first: it's the biggest thing on the page */
+            : img(m.thumb, "")) : ""}${m.type === "video" ? `<span class="thumb-play">${icon("play")}</span>` : ""}
         </button>`;
 
       /* Every property that offers this room type */
@@ -886,6 +923,11 @@
         </div>`;
     },
 
+    privacy() {
+      mount("privacy-company", `${esc(C.name)}, ${esc(C.address)}. Email <a href="mailto:${C.email}">${esc(C.email)}</a> or call <a href="tel:${C.phone.replace(/[^+\d]/g, "")}">${esc(C.phone)}</a>.`);
+      $$("[data-company-email]").forEach((el) => { el.innerHTML = `<a href="mailto:${C.email}">${esc(C.email)}</a>`; });
+    },
+
     community() {
       mount("com-videos", D.videoTestimonials.map(videoCard).join(""));
       mount("com-reviews", D.reviews.map(reviewCard).join(""));
@@ -957,6 +999,9 @@
             // Google Apps Script reads URL-encoded data; other services accept FormData
             const fd = new FormData(form);
             if (countrySel) fd.set("phone", fullPhone(countrySel.value, $("#f-phone").value));
+            /* send the university's name, not its short id, so the email reads well */
+            const uniSel = $("#f-uni");
+            if (uniSel.value) fd.set("university", uniSel.options[uniSel.selectedIndex].text);
             const body = C.formEndpoint.includes("script.google.com") ? new URLSearchParams(fd) : fd;
             const res = await fetch(C.formEndpoint, { method: "POST", body, headers: { Accept: "application/json" } });
             const data = await res.json().catch(() => ({}));

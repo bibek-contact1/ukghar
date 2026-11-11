@@ -414,7 +414,8 @@ window.UKGHAR = {
   ],
 
   /* ---------- Extra activities & events ----------
-     status: "upcoming" or "past"                                         */
+     Events move from "Upcoming" to "Recent highlights" automatically the
+     day after their date. status: "past" moves one there early.         */
   events: [
     {
       title: "Halloween Social",

@@ -600,7 +600,15 @@ a.tag:hover { border-color: var(--navy); color: var(--brand-dark); }
   .book-bar .price strong { font-size: 1.25rem; }
   body[data-page="room"] { padding-bottom: 76px; }
   body[data-page="room"] .whatsapp-float { bottom: 92px; }
+  body[data-page="room"] .cookie { bottom: 84px; }
 }
+
+/* ---------- Plain text pages (privacy notice) ---------- */
+.prose { max-width: 72ch; }
+.prose h2 { font-size: 1.4rem; margin-top: 2em; }
+.prose h2:first-child { margin-top: 0; }
+.prose ul { padding-left: 22px; }
+.prose li { margin-bottom: .4em; }
 @media (max-width: 640px) {
   .facts { grid-template-columns: repeat(2, 1fr); }
   .ticks-2, .amenities { grid-template-columns: 1fr; }

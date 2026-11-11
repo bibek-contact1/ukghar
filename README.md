@@ -26,6 +26,8 @@ Then open <http://localhost:3000>. Press `Ctrl + C` to stop.
 | Rooms & facilities | `facilities.html` | Room types and prices, what's included in rent, all facilities |
 | Student life | `community.html` | Video testimonials, reviews, upcoming and past events |
 | Contact | `contact.html` | Enquiry / book-a-viewing form, contact details, office hours, map |
+| Room details | `room.html?type=…` | One page per room type: photos, key facts, what's included, where it's available |
+| Privacy notice | `privacy.html` | How enquiry details and cookies are used |
 
 ## Updating the content
 
@@ -36,12 +38,12 @@ Then open <http://localhost:3000>. Press `Ctrl + C` to stop.
 - **Prices / room types:** `roomTypes` and each property's `priceFrom` (prices are per month; set `perPerson: true` to show "per person / month")
 - **Room photos & videos:** each room type's `photos` and `videos` lists. Clicking a room opens its own details page (`room.html?type=twin-studio`), filled from that room's `description`, `sleeps`, `bed`, `bathroom`, `kitchen`, `features`, photos and the properties that list it.
 - **Facilities:** `facilities`, grouped into sections
-- **Events:** `events`; set `status` to `"upcoming"` or `"past"`
+- **Events:** `events`. An event moves from "Upcoming" to "Recent highlights" by itself the day after its date (set `status: "past"` to move it early)
 - **FAQs, reviews, team, timeline:** their own sections
 
 ### Photos
 
-Put your photos in `assets/images/` and reference them like `"assets/images/kirtipur-room.jpg"`.
+Put your photos in `assets/images/` and reference them like `"assets/images/royal-docks-room.jpg"`.
 The demo uses online stock photos as placeholders. Swap them for real photos of your rooms before going live.
 If an image fails to load, a branded colour block shows instead, so the layout never breaks.
 
@@ -68,19 +70,27 @@ The site is fully static, so it can be hosted almost anywhere, often for free:
 - **Vercel / Cloudflare Pages / GitHub Pages:** connect a Git repo, no build command, output directory = `/`
 - **cPanel / any shared hosting:** upload everything to `public_html` (you don't need `server.js`, `package.json` or `start.bat` there)
 
-### Make the enquiry form send emails
+### Enquiry emails and room alerts
 
-The form runs in demo mode by default: it shows a success message but doesn't send anything. To receive enquiries:
+The enquiry form and the footer "room alerts & event news" box both send to the Google Apps Script
+in `formEndpoint` (`js/data.js`). Setup and updates: [email-setup/SETUP.md](email-setup/SETUP.md).
+Leave `formEndpoint` empty (`""`) to run the forms in demo mode, which only shows a success message.
 
-1. Create a free form at <https://formspree.io> (or Getform, Basin, etc.)
-2. Paste the endpoint URL into `formEndpoint` in `js/data.js`
+### Search engines and sharing
 
-That's it. Enquiries will arrive in your inbox.
+- `sitemap.xml` and `robots.txt` list the pages for Google. Both contain the full site address, so if the
+  site moves to its own domain, update the address in those two files.
+- Every page has Open Graph tags, so links shared on WhatsApp, Facebook and X show a title, description and photo.
+- `404.html` is shown for broken links (GitHub Pages picks it up automatically).
+- `privacy.html` is the privacy notice linked from the footer and cookie banner. Read it and change anything
+  that doesn't match how you actually handle enquiries.
 
 ## Project structure
 
 ```
 ├── index.html, about.html, locations.html, facilities.html, community.html, contact.html
+├── room.html, privacy.html, 404.html
+├── sitemap.xml, robots.txt  ← for search engines (contain the site address)
 ├── css/styles.css        ← design (colours, layout)
 ├── js/data.js            ← ALL content (edit this)
 ├── js/main.js            ← site logic (header, footer, filters, video player, forms)

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- If the site moves to its own domain, replace https://bibek-contact1.github.io/ukghar/ below and in robots.txt -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://bibek-contact1.github.io/ukghar/</loc><priority>1.0</priority></url>
+  <url><loc>https://bibek-contact1.github.io/ukghar/locations.html</loc><priority>0.9</priority></url>
+  <url><loc>https://bibek-contact1.github.io/ukghar/facilities.html</loc><priority>0.9</priority></url>
+  <url><loc>https://bibek-contact1.github.io/ukghar/room.html?type=premium-studio</loc><priority>0.8</priority></url>
+  <url><loc>https://bibek-contact1.github.io/ukghar/room.html?type=twin-studio</loc><priority>0.8</priority></url>
+  <url><loc>https://bibek-contact1.github.io/ukghar/room.html?type=double-sharing-room</loc><priority>0.8</priority></url>
+  <url><loc>https://bibek-contact1.github.io/ukghar/room.html?type=triple-sharing-room</loc><priority>0.8</priority></url>
+  <url><loc>https://bibek-contact1.github.io/ukghar/room.html?type=4-person-sharing-room</loc><priority>0.8</priority></url>
+  <url><loc>https://bibek-contact1.github.io/ukghar/room.html?type=5-person-sharing-room</loc><priority>0.8</priority></url>
+  <url><loc>https://bibek-contact1.github.io/ukghar/about.html</loc><priority>0.7</priority></url>
+  <url><loc>https://bibek-contact1.github.io/ukghar/community.html</loc><priority>0.7</priority></url>
+  <url><loc>https://bibek-contact1.github.io/ukghar/contact.html</loc><priority>0.8</priority></url>
+</urlset>

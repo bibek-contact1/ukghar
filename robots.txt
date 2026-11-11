@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /email-setup/
+
+Sitemap: https://bibek-contact1.github.io/ukghar/sitemap.xml

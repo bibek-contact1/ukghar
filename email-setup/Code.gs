@@ -21,6 +21,20 @@ function doPost(e) {
     // Spam bots fill in this hidden field; real visitors never see it.
     if (p._honey) return json({ success: true });
 
+    // The footer "room alerts & event news" box sends just an email address.
+    if (p.form === "newsletter") {
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(p.email || "")) {
+        return json({ success: false, message: "Please enter a valid email address." });
+      }
+      MailApp.sendEmail({
+        to: TO_EMAIL,
+        subject: "New room alerts signup: " + p.email,
+        body: p.email + " signed up for room alerts & event news on the website.",
+        name: SENDER_NAME
+      });
+      return json({ success: true });
+    }
+
     if (!p.name || !p.email) {
       return json({ success: false, message: "Please fill in your name and email." });
     }
